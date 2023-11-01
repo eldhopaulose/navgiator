@@ -73,14 +73,22 @@ class _LoginPageState extends State<LoginPage> {
                           email: emailController.text,
                           password: passwordController.text
                         ));
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => HomePage(
-                              pin: response ?? "",
+
+                        if(response != null && response.error == null){
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => HomePage(
+                                pin: response.toString(),
+                              ),
                             ),
-                          ),
-                        );
+                          );
+                        }else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(response!.error.toString()))
+                          );
+                        }
+
                         // final val = await Navigator.push(
                         //   context,
                         //   MaterialPageRoute(

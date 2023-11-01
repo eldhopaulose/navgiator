@@ -7,7 +7,7 @@ import 'endponts.dart';
 
 class AuthRepo {
   final DioClient dioClient = DioClient(Dio());
-  Future<String?> loginRequest(UserModel loginRequest) async {
+  Future<LoginResponseModel?> loginRequest(UserModel loginRequest) async {
 
     try {
 
@@ -17,27 +17,31 @@ class AuthRepo {
       if (response.statusCode == 200) {
         final loginResponse = LoginResponseModel.fromJson(response.data);
         if (loginResponse.token != null) {
-          return loginResponse.token!;
+          return loginResponse;
         } else {
           return null;
         }
       } else {
-        return null;
+        final loginResponse = LoginResponseModel.fromJson(response.data);
+         if(response.statusCode == 400){
+           return loginResponse;
+        };
       }
       // return response.data.toString();
     } on DioException catch (e) {
       print(e);
       if (e.response?.data != null) {
         final errResp = LoginResponseModel.fromJson(e.response!.data);
-        if (errResp.error != null) {
-          // code for snackbar
-          return null;
-        } else {
-          return e.toString();
-        }
+        return errResp;
+        // if (errResp.error != null) {
+        //   // code for snackbar
+        //   return null;
+        // } else {
+        //   return e.toString();
+        // }
       }
 
-      return e.toString();
+      return null;
     }
   }
 }
