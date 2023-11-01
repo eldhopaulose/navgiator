@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:navgiator/constants.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
+import 'endponts.dart';
+
 class DioClient{
 
   DioClient(this._dio){
@@ -15,21 +17,21 @@ class DioClient{
   }
   final Dio _dio;
 
-  Future<dynamic> post({required ReqType requestMode , required String path , Map<String,dynamic>? data , Map<String,dynamic>? headers , }) async{
+  Future<dynamic> post({required Endpoints endpoints, Map<String,dynamic>? data , Map<String,dynamic>? headers , }) async{
     Response response;
     if(headers != null){
       _dio.options.headers.addAll(headers);
     }
     try{
-      switch (requestMode) {
+      switch (endpoints.type()) {
         case ReqType.GET:
-          response = await _dio.get("$baseUrl/$path", queryParameters: data ,);
+          response = await _dio.get("$baseUrl/${endpoints.path()}", queryParameters: data ,);
           break;
         case ReqType.POST:
-          response = await _dio.post("$baseUrl/$path", data: data);
+          response = await _dio.post("$baseUrl/${endpoints.path()}", data: data);
           break;
         case ReqType.PUT:
-          response = await _dio.put("$baseUrl/$path", data: data);
+          response = await _dio.put("$baseUrl/${endpoints.path()}", data: data);
           break;
       }
     }on DioException catch (e){

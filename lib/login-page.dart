@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:navgiator/dio_client.dart';
+import 'package:navgiator/network/auth_repo.dart';
+import 'package:navgiator/network/dio_client.dart';
 import 'package:navgiator/home-page.dart';
 import 'package:navgiator/loginresponsemode.dart';
+import 'package:navgiator/network/endponts.dart';
 import 'package:navgiator/otp-page.dart';
 import 'package:dio/dio.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
@@ -19,50 +21,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController passwordController = TextEditingController();
 
 
-  final DioClient dioClient= DioClient(Dio());
-  Future<String?> request() async {
-    // final dio = Dio()
-    //   ..interceptors.add(PrettyDioLogger(
-    //     requestHeader: true,
-    //     requestBody: true,
-    //     responseBody: true,
-    //     responseHeader: false,
-    //     compact: false,
-    //   ));
-    try {
-      final UserModel userModel = UserModel(
-        email: emailController.text,
-        password: passwordController.text,
-      );
-      final response  = await dioClient.post(requestMode: ReqType.POST, path: 'api/login', data: userModel.toJson());
-      if (response.statusCode == 200) {
-        final loginResponse = LoginResponseModel.fromJson(response.data);
-        if (loginResponse.token != null) {
-          return loginResponse.token!;
 
-        } else {
-          return null;
-        }
-      } else {
-        return null;
-      }
-      // return response.data.toString();
-    } on DioException catch (e) {
-
-      print(e);
-      if(e.response?.data != null){
-        final errResp = LoginResponseModel.fromJson(e.response!.data);
-        if(errResp.error != null) {
-          // code for snackbar
-          return null;
-        }else{
-          return e.toString();
-        }
-      }
-
-      return e.toString();
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -109,15 +68,19 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   ElevatedButton(
                       onPressed: () async {
-                       final response = await request();
-                       Navigator.push(
-                         context,
-                         MaterialPageRoute(
-                           builder: (context) => HomePage(
-                             pin: response ?? "",
-                           ),
-                         ),
-                       );
+                        AuthRepo repo = AuthRepo();
+                        final response = await repo.loginRequest(UserModel(
+                          email: emailController.text,
+                          password: passwordController.text
+                        ));
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => HomePage(
+                              pin: response ?? "",
+                            ),
+                          ),
+                        );
                         // final val = await Navigator.push(
                         //   context,
                         //   MaterialPageRoute(
