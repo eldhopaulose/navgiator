@@ -1,16 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:navgiator/network/auth_repo.dart';
-import 'package:navgiator/network/dio_client.dart';
-import 'package:navgiator/home-page.dart';
-import 'package:navgiator/loginresponsemode.dart';
-import 'package:navgiator/network/endponts.dart';
-import 'package:navgiator/otp-page.dart';
-import 'package:dio/dio.dart';
-import 'package:pretty_dio_logger/pretty_dio_logger.dart';
-import 'package:navgiator/usermodel.dart';
+
+
+part of 'package:navgiator/bloc/login/login_bloc.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
+
 
   @override
   State<LoginPage> createState() => _LoginPageState();

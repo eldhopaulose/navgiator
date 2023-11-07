@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:navgiator/login-page.dart';
+
+import 'bloc/login/login_bloc.dart';
 
 void main() {
   runApp(const MyApp());
