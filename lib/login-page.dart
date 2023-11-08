@@ -1,10 +1,7 @@
-
-
 part of 'package:navgiator/bloc/login/login_bloc.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
-
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -13,107 +10,102 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  late ProgressDialog progressDialog;
 
-
-
+  @override
+  void initState() {
+    super.initState();
+    progressDialog = ProgressDialog(context: context);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: SizedBox(
-            width: double.infinity,
-            height: double.infinity,
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    "Login",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+    return BlocListener<LoginBloc, LoginState>(
+      listener: loginListener,
+      child: Scaffold(
+        body: SafeArea(
+          child: Center(
+            child: SizedBox(
+              width: double.infinity,
+              height: double.infinity,
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "Login",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  TextField(
-                    controller: emailController,
-                    decoration: const InputDecoration(
-                      labelText: 'Email',
-                      border: OutlineInputBorder(),
+                    const SizedBox(
+                      height: 20,
                     ),
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  TextField(
-                    controller: passwordController,
-                    decoration: const InputDecoration(
-                      labelText: 'Password',
-                      border: OutlineInputBorder(),
+                    TextField(
+                      controller: emailController,
+                      decoration: const InputDecoration(
+                        labelText: 'Email',
+                        border: OutlineInputBorder(),
+                      ),
                     ),
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  ElevatedButton(
-                      onPressed: () async {
-                        AuthRepo repo = AuthRepo();
-                        final response = await repo.loginRequest(UserModel(
-                          email: emailController.text,
-                          password: passwordController.text
-                        ));
-
-                        if(response != null && response.error == null){
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => HomePage(
-                                pin: response.toString(),
-                              ),
-                            ),
-                          );
-                        }else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(response!.error.toString()))
-                          );
-                        }
-
-                        // final val = await Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //       builder: (context) => const OtpPage()),
-                        // );
-                        // print(val);
-                        // if (val != null) {
-                        //   // ignore: use_build_context_synchronously
-                        //   Navigator.push(
-                        //     context,
-                        //     MaterialPageRoute(
-                        //       builder: (context) => HomePage(
-                        //         pin: val,
-                        //       ),
-                        //     ),
-                        //   );
-                        // }
-                      },
-                      child: const Text(
-                        "Login",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ))
-                ],
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    TextField(
+                      controller: passwordController,
+                      decoration: const InputDecoration(
+                        labelText: 'Password',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    ElevatedButton(
+                        onPressed: () {
+                          context.read<LoginBloc>().add(_OnLoginClicked(
+                              email: emailController.text,
+                              pass: passwordController.text));
+                        },
+                        child: const Text(
+                          "Login",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ))
+                  ],
+                ),
               ),
             ),
           ),
         ),
       ),
     );
+  }
+
+  loginListener(BuildContext context, LoginState state) {
+    if (state is _Loading) {
+      progressDialog.show(msg: "Logging in");
+    } else {
+      progressDialog.close();
+      if (state is _LoginSuccess) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => Provider(
+                    create: (_) => HomeBloc(),
+                    child: HomePage(
+                      pin: "",
+                    ),
+                  )),
+        );
+      } else if (state is _LoginFail) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(state.error)));
+      }
+    }
   }
 }
