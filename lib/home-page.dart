@@ -18,8 +18,7 @@ class _HomePageState extends State<HomePage> {
       ),
       body: FutureBuilder(
           future: context
-              .read<HomeBloc>()
-              .add(_GetData), // Specify the future to be awaited.
+              .read<HomeBloc>().fetchData(), // Specify the future to be awaited.
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return Center(
@@ -35,7 +34,7 @@ class _HomePageState extends State<HomePage> {
             if (snapshot.hasData) {
               final homeDetails = snapshot.data;
               return ListView.builder(
-                itemCount: 1,
+                itemCount: snapshot.data?.data?.length ?? 0,
                 itemBuilder: (BuildContext context, int index) {
                   return Container(
                     margin: const EdgeInsets.all(10),
@@ -52,8 +51,7 @@ class _HomePageState extends State<HomePage> {
                           width: 60,
                           height: 60,
                           child: ClipOval(
-                            child: Image.network(
-                              "${homeData?.avatar ?? ''}",
+                            child: Image.network(snapshot.data?.data?[index].avatar ?? "",
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -69,8 +67,8 @@ class _HomePageState extends State<HomePage> {
                                 height: 10,
                               ),
                               Text(
-                                  "${homeData?.firstName ?? ''}  ${homeData?.lastName ?? ''}"),
-                              Text("${homeData?.email ?? ''}"),
+                                  "${snapshot.data?.data?[index].firstName ?? ''}  ${snapshot.data?.data?[index].lastName ?? ''}"),
+                              Text(snapshot.data?.data?[index].email ?? ''),
                             ],
                           ),
                         )
