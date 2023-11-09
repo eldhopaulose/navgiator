@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:navgiator/home_details_model.dart';
 import 'package:navgiator/usermodel.dart';
 
 import '../loginresponsemode.dart';
@@ -8,12 +9,9 @@ import 'endponts.dart';
 class AuthRepo {
   final DioClient dioClient = DioClient(Dio());
   Future<LoginResponseModel?> loginRequest(UserModel loginRequest) async {
-
     try {
-
       final response = await dioClient.post(
-          endpoints: Endpoints.login,
-          data: loginRequest.toJson());
+          endpoints: Endpoints.login, data: loginRequest.toJson());
       if (response.statusCode == 200) {
         final loginResponse = LoginResponseModel.fromJson(response.data);
         if (loginResponse.token != null) {
@@ -23,9 +21,10 @@ class AuthRepo {
         }
       } else {
         final loginResponse = LoginResponseModel.fromJson(response.data);
-         if(response.statusCode == 400){
-           return loginResponse;
-        };
+        if (response.statusCode == 400) {
+          return loginResponse;
+        }
+        ;
       }
       // return response.data.toString();
     } on DioException catch (e) {
@@ -43,5 +42,32 @@ class AuthRepo {
 
       return null;
     }
+  }
+
+  Future<HomeDetailsModel?> userResponse() async {
+    try {
+      final response = await dioClient.post(endpoints: Endpoints.home);
+      if (response.statusCode == 200) {
+        final homeResponse = HomeDetailsModel.fromJson(response.data);
+        if (homeResponse.data != null) {
+          return homeResponse;
+        } else {
+          return null;
+        }
+      } else {
+        final homeResponse = HomeDetailsModel.fromJson(response.data);
+        if (response.statusCode == 400) {
+          return homeResponse;
+        }
+        ;
+      }
+      // return response.data.toString();
+    } on DioException catch (e) {
+      if (e.response!.data != null) {
+        final homeResponse = HomeDetailsModel.fromJson(e.response!.data);
+        return homeResponse;
+      }
+    }
+    return null;
   }
 }

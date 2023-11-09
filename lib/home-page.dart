@@ -1,36 +1,93 @@
 part of 'package:navgiator/bloc/home/home_bloc.dart';
 
 class HomePage extends StatefulWidget {
-  final String pin;
-
-  const HomePage({super.key, required this.pin});
+  const HomePage({Key? key}) : super(key: key);
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
   @override
-  // void initState() {
-  //   super.initState();
-  //   context.read<HomeBloc>().add(_GetData);
-  // }
-
-  @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      // body: BlocBuilder<HomeBloc, HomeState>(
-      //   builder: (context, state) {
-      //     if(state  is _loading)
-      //       return CircularProgressIndicator()
-      //           else if (stat is  Sucesss)
-      //             // return list veiew
-      //             else{
-      //               return Center(child: Text("No data found"),)
-      //     }
-      //   },
-      // ),
-      body: Center(child: Text("Home")),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Home"),
+        centerTitle: true,
+        backgroundColor: Colors.blue,
+      ),
+      body: FutureBuilder(
+          future: context
+              .read<HomeBloc>()
+              .add(_GetData), // Specify the future to be awaited.
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Center(
+                child: Text('Error: ${snapshot.error}'),
+              );
+            }
+
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: Text("loading"),
+              );
+            }
+            if (snapshot.hasData) {
+              final homeDetails = snapshot.data;
+              return ListView.builder(
+                itemCount: 1,
+                itemBuilder: (BuildContext context, int index) {
+                  return Container(
+                    margin: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(10),
+                    width: double.infinity,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.amber,
+                    ),
+                    child: Row(
+                      children: <Widget>[
+                        SizedBox(
+                          width: 60,
+                          height: 60,
+                          child: ClipOval(
+                            child: Image.network(
+                              "${homeData?.avatar ?? ''}",
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Text(
+                                  "${homeData?.firstName ?? ''}  ${homeData?.lastName ?? ''}"),
+                              Text("${homeData?.email ?? ''}"),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                  );
+                },
+              );
+            } else {
+              // Handle the case when data is null
+              return const Center(
+                child: Text('No data available'),
+              );
+            }
+
+            // Handle the case when the data is available.
+          }),
     );
   }
 }

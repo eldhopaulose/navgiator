@@ -97,9 +97,7 @@ class _LoginPageState extends State<LoginPage> {
           MaterialPageRoute(
               builder: (context) => Provider(
                     create: (_) => HomeBloc(),
-                    child: HomePage(
-                      pin: "",
-                    ),
+                    child: const HomePage(),
                   )),
         );
       } else if (state is _LoginFail) {
