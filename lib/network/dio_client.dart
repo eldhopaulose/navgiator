@@ -21,6 +21,7 @@ class DioClient{
     Response response;
     if(headers != null){
       _dio.options.headers.addAll(headers);
+
     }
     try{
       switch (endpoints.type()) {

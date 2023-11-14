@@ -46,6 +46,7 @@ class AuthRepo {
 
   Future<HomeDetailsModel?> userResponse() async {
     try {
+     // final response = await dioClient.post(endpoints: Endpoints.home,headers: {"X-Api-Key": "ihasidjsad"});
       final response = await dioClient.post(endpoints: Endpoints.home);
       if (response.statusCode == 200) {
         final homeResponse = HomeDetailsModel.fromJson(response.data);

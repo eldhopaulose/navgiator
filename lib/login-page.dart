@@ -12,10 +12,12 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController passwordController = TextEditingController();
   late ProgressDialog progressDialog;
 
+
   @override
   void initState() {
     super.initState();
     progressDialog = ProgressDialog(context: context);
+
   }
 
   @override
